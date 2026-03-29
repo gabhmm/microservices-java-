@@ -1,36 +1,40 @@
 package br.edu.atitus.greetingservice.controllers;
 
 import br.edu.atitus.greetingservice.configs.GreetingConfig;
+import br.edu.atitus.greetingservice.dtos.GreetingRecordDto;
 import org.springframework.beans.factory.annotation.Value;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestParam;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.validation.annotation.Validated;
+import org.springframework.web.bind.annotation.*;
 
 @RestController
 @RequestMapping("/greeting")
 public class GreetingController {
 
-//    @Value("${greeting-service.greeting}")
-//    private String greeting;
-//
-//    @Value("${greeting-service.default-name}")
-//    private String defaultName;
-
     private final GreetingConfig config;
-    //Injeção de dependencia
 
     public GreetingController(GreetingConfig config) {
         this.config = config;
     }
 
-    @GetMapping({"", "/"})
-    public String getGreeting(@RequestParam(required = false) String name) {
+    @GetMapping({"", "/","/{name}"})
+    public String getGreeting(@RequestParam(required = false) String name,
+                              @PathVariable(name = "name",required = false) String namePath) {
 
-        name = name != null ? name : config.getDefaultName();
+        String finalName = name != null ? name : namePath;
 
-        String greetingReturn = String.format("%s %s!!!", config.getGreeting(), name);
+        String greetingReturn = String.format("%s %s!!!", config.getGreeting(),finalName = finalName != null ? finalName : config.getDefaultName());
         return greetingReturn;
 
+    }
+
+    @PostMapping
+    public String postGreeting(@RequestBody GreetingRecordDto greetingRecordDto) {
+
+        String name = greetingRecordDto.name();
+        if (name == null)
+            name = config.getDefaultName();
+
+        String greetingReturn = String.format("%s %s!!!", config.getGreeting(),name);
+        return greetingReturn;
     }
 }
