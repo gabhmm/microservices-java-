@@ -31,7 +31,7 @@ public class GreetingController {
     public String postGreeting(@RequestBody GreetingRecordDto greetingRecordDto) {
 
         String name = greetingRecordDto.name();
-        if (name == null)
+        if (name.isBlank())
             name = config.getDefaultName();
 
         String greetingReturn = String.format("%s %s!!!", config.getGreeting(),name);
